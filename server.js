@@ -31,11 +31,29 @@ io.on('connection', function(socket){
 
 	socket.on('join', function(chatname){
 		var user = {
+			socketId: socket.id,
 			session: Math.ceil(Math.random(0, 1) * 100000) + '_' + (new Date()).getTime(),
-			username: chatname 
+			username: chatname,
+			isAuth: true
 		}
 		users_ctrl.addUser(user);
 		console.log(user);
+
+		io.sockets.connected[socket.id].emit('redirect messaging', user);
+	});
+
+	socket.on('send message', function(msg){
+		var user = users_ctrl.findBySocket(socket.id);
+		if(user){
+			user = user.user;
+			var data = {
+				user: {
+					username: user.username
+				}, 
+				message: msg
+			};
+			socket.broadcast.emit('new message', data);
+		}
 	});
 });
 
