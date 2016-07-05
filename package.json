@@ -15,6 +15,7 @@
   "author": "Kevin S. Orge",
   "license": "ISC",
   "dependencies": {
+    "crypto": "0.0.3",
     "express": "^4.14.0",
     "mongodb": "^2.1.18",
     "socketio": "^1.0.0"
