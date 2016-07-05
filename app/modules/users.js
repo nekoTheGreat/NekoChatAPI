@@ -31,7 +31,23 @@ Users.prototype.findUser = function(user){
 	var f_user = undefined;
 	for(var i in self.users){
 		var _user = self.users[i];
-		if(_user._id == user._id){
+		if(_user.session == user.session){
+			f_indx = i;
+			f_user = _user;
+		}
+	}
+
+	if(f_indx == -1) return undefined;
+	return {index: f_indx, user: f_user};
+}
+Users.prototype.findBySocket = function(socketId){
+	var self = this;
+	
+	var f_indx = -1;
+	var f_user = undefined;
+	for(var i in self.users){
+		var _user = self.users[i];
+		if(_user.socketId == socketId){
 			f_indx = i;
 			f_user = _user;
 		}
