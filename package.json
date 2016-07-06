@@ -17,6 +17,7 @@
   "dependencies": {
     "crypto": "0.0.3",
     "express": "^4.14.0",
+    "lodash": "^4.13.1",
     "mongodb": "^2.1.18",
     "redis": "^2.6.2",
     "socketio": "^1.0.0"

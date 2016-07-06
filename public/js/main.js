@@ -8,15 +8,24 @@ chat.init = function(){
 
 	self.socket = io();
 
-	self.socket.on('redirect messaging', function(user){
+	self.socket.on('send redirect messaging', function(user){
 		self.user = user;
 		self.switchPage('messaging');
 	});
-	self.socket.on('redirect join', function(){
+	self.socket.on('send redirect join', function(){
 		self.switchPage('join');
 	});
-	self.socket.on('new message', function(data){
+	self.socket.on('send new message', function(data){
 		self.displayMessage(data.user, data.message);
+	});
+	self.socket.on('send new user', function(user){
+		self.displayNewUser(user);
+	});
+	self.socket.on('send online users', function(users){
+		self.displayOnlineUsers(users);
+	});
+	self.socket.on('send user disconnect', function(user){
+		self.displayUserLogout(user);
 	});
 
 	$('#join_form').submit(function(e){
@@ -76,6 +85,15 @@ chat.displayMessage = function(user, message){
 			$('#message_panel').scrollTop(height);
 		}
 	}
+}
+chat.displayNewUser = function(user){
+	console.log(user);
+}
+chat.displayOnlineUsers = function(users){
+	console.log(users);
+}
+chat.displayUserLogout = function(user){
+	console.log(user);
 }
 
 $(function(){

@@ -1,4 +1,4 @@
-var User = require('./user');
+var User 	= require('./user');
 
 function Users(){
 	var self = this;
@@ -17,9 +17,8 @@ Users.prototype.addUser = function(user){
 Users.prototype.removeUser = function(user){
 	var self = this;
 
-	var found = self.find(user);
-	if(found){
-		delete self.users[found.index];
+	if(user && user.index){
+		delete self.users[user.index];
 		return true;
 	}
 	return false;

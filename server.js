@@ -8,7 +8,10 @@ var MONGODB_URL_DB		= "mongodb://localhost:27017/nekochat";
 var express		= require('express'),
 	DbClient 	= require(MODULES_DIR+"/dbclient"),
 	Auth 		= require(MODULES_DIR+"/auth"),
-	Users 		= require(MODULES_DIR+"/users");
+	Users 		= require(MODULES_DIR+"/users"),
+	_ 			= require('lodash'),
+	_lang		= require('lodash/lang'),
+	_collecton	= require('lodash/collection');
 
 var app = express();
 app.use(express.static(PUBLIC_DIR));
@@ -28,6 +31,20 @@ dbclient.connect(function(db, error){
 });
 
 io.on('connection', function(socket){
+	var whoseOnlineCron = setInterval(function(){
+		var users = _lang.clone(users_ctrl.users);
+		var online_users = [];
+		_(users).forEach(function(user){
+			if(user){
+				online_users.push({username: user.username});
+			}
+		});
+
+		var _socket = io.sockets.connected[socket.id];
+		if(_socket){
+			_socket.emit('send online users', online_users);
+		}
+	}, 2000);
 
 	socket.on('join', function(chatname){
 		var user = {
@@ -37,9 +54,8 @@ io.on('connection', function(socket){
 			isAuth: true
 		}
 		users_ctrl.addUser(user);
-		console.log(user);
-
-		io.sockets.connected[socket.id].emit('redirect messaging', user);
+		io.sockets.connected[socket.id].emit('send redirect messaging', user);
+		socket.broadcast.emit('send new user', user);
 	});
 
 	socket.on('send message', function(msg){
@@ -52,7 +68,18 @@ io.on('connection', function(socket){
 				}, 
 				message: msg
 			};
-			socket.broadcast.emit('new message', data);
+			socket.broadcast.emit('send new message', data);
+		}
+	});
+
+	socket.on('disconnect', function(){
+		var user = users_ctrl.findBySocket(socket.id);
+		if(user){
+			var user = _lang.clone(user);
+			var response = { username: user.username };
+			socket.broadcast.emit('send user disconnect', response);
+			
+			users_ctrl.removeUser(user);
 		}
 	});
 });
