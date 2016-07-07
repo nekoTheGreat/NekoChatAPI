@@ -1,94 +1,62 @@
-var API_PORT 			= 8082;
-var APP_DIR 			= __dirname + '/app';
-var MODULES_DIR 		= APP_DIR + '/modules';
-var VIEWS_DIR			= APP_DIR + '/views';
-var PUBLIC_DIR			= __dirname + '/public';
-var MONGODB_URL_DB		= "mongodb://localhost:27017/nekochat";
-
+var config 		= require('./config.js')
 var express		= require('express'),
-	DbClient 	= require(MODULES_DIR+"/dbclient"),
-	Auth 		= require(MODULES_DIR+"/auth"),
-	Users 		= require(MODULES_DIR+"/users"),
 	_ 			= require('lodash'),
 	_lang		= require('lodash/lang'),
 	_collecton	= require('lodash/collection');
+	
+var	DbClient 	= require(config.modules_dir+"/dbclient"),
+	Auth 		= require(config.modules_dir+"/auth"),
+	Chat 		= require(config.app_dir+'/chat');
 
 var app = express();
-app.use(express.static(PUBLIC_DIR));
-var server  = app.listen(API_PORT, function(){
+app.use(express.static(config.public_dir));
+var server  = app.listen(config.api_port, function(){
 	var port  = server.address().port;
 	console.log('Server running at port', port);
 });
 var io = require('socket.io')(server);
 
 // lets start here
-var dbclient 	= new DbClient(MONGODB_URL_DB),
-	users_ctrl 	= new Users(),
-	auth_ctrl 	= undefined;
+var dbclient 	= new DbClient(config.mongodb_url),
+	auth_ctrl 	= undefined,
+	chat 		= new Chat(config);
 
 dbclient.connect(function(db, error){
 	auth_ctrl = new Auth(db);
 });
 
-io.on('connection', function(socket){
-	var whoseOnlineCron = setInterval(function(){
-		var users = _lang.clone(users_ctrl.users);
-		var online_users = [];
-		_(users).forEach(function(user){
-			if(user){
-				online_users.push({username: user.username});
-			}
-		});
-
-		var _socket = io.sockets.connected[socket.id];
-		if(_socket){
-			_socket.emit('send online users', online_users);
-		}
-	}, 2000);
-
-	socket.on('join', function(chatname){
-		var user = {
-			socketId: socket.id,
-			session: Math.ceil(Math.random(0, 1) * 100000) + '_' + (new Date()).getTime(),
-			username: chatname,
-			isAuth: true
-		}
-		users_ctrl.addUser(user);
-		io.sockets.connected[socket.id].emit('send redirect messaging', user);
-		socket.broadcast.emit('send new user', user);
-	});
-
-	socket.on('send message', function(msg){
-		var user = users_ctrl.findBySocket(socket.id);
-		if(user){
-			user = user.user;
-			var data = {
-				user: {
-					username: user.username
-				}, 
-				message: msg
-			};
-			socket.broadcast.emit('send new message', data);
-		}
-	});
-
-	socket.on('disconnect', function(){
-		var user = users_ctrl.findBySocket(socket.id);
-		if(user){
-			var user = _lang.clone(user);
-			var response = { username: user.username };
-			socket.broadcast.emit('send user disconnect', response);
-			
-			users_ctrl.removeUser(user);
-		}
-	});
-});
-
 app.get('/', function(req, res){
-	res.sendFile(VIEWS_DIR + '/index.html');
+	res.sendFile(config.views_dir + '/index.html');
 });
 
 app.get('/messaging', function(req, res){
+	io.on('connection', function(socket){
+
+		socket.on('join', function(chatname){
+			var user_socket = io.sockets.connected[socket.id];
+			if(user_socket){
+				var user = chat.processJoin(user_socket, chatname);
+				chat.notifyAllNewUser(socket, user);
+			}
+		});
+
+		socket.on('send message', function(message){
+			chat.processNewMessage(socket, message);
+		});
+
+		socket.on('disconnect', function(){
+			var user = chat.processUserLogout(socket);
+			if(user){
+				chat.notifyAllUserLogout(socket, user);
+			}
+		});
+
+		socket.on('get online users', function(){
+			chat.processOnlineUsers(socket);
+		});
+	});
+
+	res.sendFile(config.views_dir + '/index.html');
 });
 
 app.get('/api', function(req, res){
