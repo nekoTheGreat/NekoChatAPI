@@ -43,6 +43,10 @@ chat.init = function(){
 	$(window).on('blur', function(){
 		self.window_focussed = false;
 	});
+
+	setInterval(function(){
+		self.socket.emit('get online users');
+	}, 1000);
 }
 chat.switchPage = function(page){
 	$('.page').hide();
@@ -65,15 +69,20 @@ chat.sendMessage = function(){
 
 	var msg = $('#message').prop('value');
 	self.socket.emit('send message', msg);
-	self.displayMessage(self.user, msg);
+	self.displayMessage(self.user, msg, true);
+	$('#message').prop('value', '');
 }
-chat.displayMessage = function(user, message){
+chat.displayMessage = function(user, message, owned){
 	var self = this;
 
 	if(user && message){
+		var attr = 'style="background: rgba(211, 240, 241, 0.21);"';
+		if(owned){
+			attr = '';
+		}
 		var msg_panel = $('#message_panel');
 		var msg_tpl = [
-			'<dl>',
+			'<dl '+attr+'>',
 			  '<dt>'+user.username+'</dt>',
 			  '<dd>'+message+'</dd>',
 			'</dl>',
@@ -90,7 +99,12 @@ chat.displayNewUser = function(user){
 	console.log(user);
 }
 chat.displayOnlineUsers = function(users){
-	console.log(users);
+	var list_el = $('#online_users > ul');
+	list_el.html('');
+
+	$.each(users, function(i, v){
+		list_el.append('<li class="list-group-item">'+v.username+'</li>');
+	});
 }
 chat.displayUserLogout = function(user){
 	console.log(user);
