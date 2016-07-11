@@ -25,15 +25,14 @@ Users.prototype.addUser = function(data){
 	}
 	return false;
 }
-Users.prototype.removeUser = function(user){
+Users.prototype.removeUser = function(session){
 	var self = this;
 
-	if(user){
-		var result = _.remove(users, function(u){
-			return u.session = user.session;
+	if(session){
+		_.remove(users, function(u){
+			var _u = u.getAllInfo();
+			return _u.session == session;
 		});
-
-		return result;
 	}
 	return false;
 }

@@ -64,12 +64,14 @@ app.post('/messenger', function(req, res){
 
 io.on('connection', function(socket){
 	console.log('new connection');
-	if(username){
+	_username = username;
+	username = undefined;
+	if(_username){
 		var user_socket = io.sockets.connected[socket.id];
-		var user = chat.processJoin(user_socket, username);
+		var user = chat.processJoin(user_socket, _username);
 		chat.notifyAllNewUser(socket, user);
 	}
-	username = undefined;
+	
 
 	socket.on('send message', function(message){
 		console.log('receiving message');

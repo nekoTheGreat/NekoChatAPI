@@ -59,9 +59,9 @@ function Chat(config){
 	self.processUserLogout = function(socket){
 		self.users_mgr.findUser(socket.id, function(user){
 			if(user){
-				var info = user.getInfo();
+				var info = user.getAllInfo();
 				console.log('user: ' + info.username + ' is disconnected');
-				self.users_mgr.removeUser(info.username);
+				self.users_mgr.removeUser(info.session);
 			}
 		});
 	}
