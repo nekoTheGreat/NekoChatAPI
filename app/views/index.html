@@ -1,4 +1,21 @@
-<form id="join_form" method="POST" action="/messenger">
-	<input type="text" id="chatname" name="username" placeholder="Chat Name">
-	<button id="add_user">Join</button>
-</form/>
+<div class="row" style="padding-top:100px;">
+	<div class="col-md-3">&nbsp;</div>
+	<div class="col-md-6">
+		<div class="card">
+			<div class="card-block">
+				<h4 class="card-title">New Users</h4>
+
+				<form class="form-horizontal" id="join_form" method="POST" action="/messenger">
+					<div class="md-form">
+						<input type="text" id="chatname" class="form-control" name="username">
+						<label for="chatname" class="">Username</label>
+					</div>
+					<div class="md-form">
+						<button id="add_user" class="btn btn-success waves-effect pull-xs-right">Join</button>
+					</div>
+				</form/>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-3">&nbsp;</div>
+</div>
