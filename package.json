@@ -15,8 +15,10 @@
   "author": "Kevin S. Orge",
   "license": "ISC",
   "dependencies": {
+    "body-parser": "^1.15.2",
     "crypto": "0.0.3",
     "express": "^4.14.0",
+    "express-handlebars": "^3.0.0",
     "lodash": "^4.13.1",
     "mongodb": "^2.1.18",
     "redis": "^2.6.2",

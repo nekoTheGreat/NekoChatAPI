@@ -29,7 +29,7 @@ chat.init = function(){
 	});
 
 	$('#join_form').submit(function(e){
-		e.preventDefault();
+		//e.preventDefault();
 		self.join();
 	});
 	$('#message_form').submit(function(e){

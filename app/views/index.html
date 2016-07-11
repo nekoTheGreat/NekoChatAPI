@@ -1,35 +1,4 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<title>Chat Application</title>
-	<link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css">
-	<style type="text/css">
-		#message_panel{
-			height: 400px;
-			border: 1px solid #ccc;
-			border-radius: 2px;
-			width: 300px;
-			overflow-y: auto;
-		}
-	</style>
-</head>
-<body>
-	<div class="page" id="join_page">
-		<form id="join_form">
-			<input type="text" id="chatname" placeholder="Chat Name">
-			<button id="add_user">Join</button>
-		</form/>
-	</div>
-	<div class="page" id="messaging_page" style="display:none;">
-		<div id="message_panel">
-		</div>
-		<form id="message_form">
-			<input type="text" id="message" placeholder="Your message">
-			<button id="submit_message">Send</button>
-		</form/>
-	</div>
-</body>
-	<script type="text/javascript" src="js/jquery.min.js"></script>
-	<script type="text/javascript" src="js/socket.io.js"></script>
-	<script type="text/javascript" src="js/main.js"></script>
-</html>
+<form id="join_form" method="POST" action="/messenger">
+	<input type="text" id="chatname" name="username" placeholder="Chat Name">
+	<button id="add_user">Join</button>
+</form/>

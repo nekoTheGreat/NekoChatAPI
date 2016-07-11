@@ -2,7 +2,9 @@ var crypto = require('crypto');
 
 function Auth(db){
 	var self = this;
-	self.user_collection = db.collection('Users');
+	if(db){
+		self.user_collection = db.collection('Users');
+	}
 }
 Auth.prototype.authenticate = function(credential, callback){
 	var self = this;
